@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notification Loop</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        width: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, sans-serif;
+        background: #f6f1eb;
+        color: #2e211d;
+        padding: 16px;
+      }
+
+      .popup {
+        width: min(92vw, 420px);
+        background: #fffaf7;
+        border-radius: 18px;
+        box-shadow: 0 22px 50px rgba(39, 25, 20, 0.18);
+        padding: 24px 18px;
+        text-align: center;
+        border: 1px solid rgba(97, 73, 63, 0.15);
+      }
+
+      .message {
+        font-size: clamp(1.1rem, 4vw, 1.45rem);
+        line-height: 1.5;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 14px 28px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease, font-size 0.2s ease, padding 0.2s ease, box-shadow 0.2s ease;
+        min-width: 120px;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .yes {
+        background: #3c7a5b;
+        color: white;
+      }
+
+      .no {
+        background: #b8574f;
+        color: white;
+        font-size: 1rem;
+      }
+
+      .no.selected {
+        box-shadow: 0 0 0 6px rgba(184, 87, 79, 0.15);
+      }
+
+      @media (max-width: 480px) {
+        .buttons {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        button {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popup">
+      <div id="messageText" class="message">love moko?</div>
+      <div class="buttons">
+        <button id="yesBtn" class="yes">Yes</button>
+        <button id="noBtn" class="no">No</button>
+      </div>
+    </div>
+
+    <script>
+      const messageText = document.getElementById('messageText');
+      const yesBtn = document.getElementById('yesBtn');
+      const noBtn = document.getElementById('noBtn');
+
+      const prompts = [
+        'love mo ba mee?',
+        'siguro miss mo ko, miss mo ba me bubby?',
+        'ok bahala ka dyan'
+      ];
+
+      let promptIndex = 0;
+      let noScale = 1;
+
+      function setNoButtonSize(scale) {
+        noBtn.style.fontSize = `${scale}rem`;
+        noBtn.style.padding = `${12 + scale * 4}px ${26 + scale * 8}px`;
+        noBtn.style.transform = `scale(${scale})`;
+      }
+
+      function resetButtons() {
+        noScale = 1;
+        yesBtn.style.display = 'inline-block';
+        noBtn.classList.remove('selected');
+        setNoButtonSize(1);
+      }
+
+      function showPrompt(text) {
+        messageText.textContent = text;
+        yesBtn.textContent = 'Yes';
+        noBtn.textContent = 'No';
+      }
+
+      function nextPrompt() {
+        promptIndex = (promptIndex + 1) % prompts.length;
+        resetButtons();
+        showPrompt(prompts[promptIndex]);
+      }
+
+      yesBtn.addEventListener('click', () => {
+        if (promptIndex === 0) {
+          noScale = Math.min(noScale + 0.35, 2.6);
+          noBtn.classList.add('selected');
+          setNoButtonSize(noScale);
+          promptIndex = 1;
+          showPrompt(prompts[1]);
+          return;
+        }
+
+        if (promptIndex === 1) {
+          noScale = Math.min(noScale + 0.35, 2.6);
+          noBtn.classList.add('selected');
+          setNoButtonSize(noScale);
+          promptIndex = 2;
+          showPrompt(prompts[2]);
+          return;
+        }
+
+        promptIndex = 0;
+        resetButtons();
+        showPrompt(prompts[0]);
+      });
+
+      noBtn.addEventListener('click', () => {
+        noScale = 1;
+        noBtn.classList.add('selected');
+        setNoButtonSize(1.2);
+
+        if (promptIndex === 0) {
+          promptIndex = 1;
+          showPrompt(prompts[1]);
+          return;
+        }
+
+        if (promptIndex === 1) {
+          promptIndex = 2;
+          showPrompt(prompts[2]);
+          return;
+        }
+
+        promptIndex = 0;
+        resetButtons();
+        showPrompt(prompts[0]);
+      });
+
+      showPrompt(prompts[0]);
+      resetButtons();
+    </script>
+  </body>
+</html>
